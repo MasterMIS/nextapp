@@ -1,8 +1,17 @@
 import postgres from "postgres";
 import bcrypt from "bcryptjs";
+import dotenv from "dotenv";
+
+// Load environment variables from .env.local
+dotenv.config({ path: '.env.local' });
 
 async function setupDatabase() {
-  const sql = postgres(process.env.DATABASE_URL!);
+  const connectionString = process.env.POSTGRES_URL_NON_POOLING || process.env.POSTGRES_URL || process.env.DATABASE_URL!;
+  console.log('🐘 Connecting to:', connectionString ? connectionString.split('@')[1] : 'MISSING URL');
+  const sql = postgres(connectionString, {
+    prepare: false,
+    ssl: 'require',
+  });
   
   try {
     console.log('Setting up ERP database...');
